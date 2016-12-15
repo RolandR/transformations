@@ -1,0 +1,149 @@
+
+
+*{
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+}
+
+body, html{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	font-family: sans;
+}
+
+body{
+	background-color: #222222;
+}
+
+canvas{
+	height: 100%;
+	background-color: #000000;
+}
+
+hr{
+	border-bottom: 1px #AAAAAA solid;
+	margin: 10px 0px;
+}
+
+input[type=range]{
+	width: 100%;
+	background: #888888;
+	height: 4px;
+	margin: 10px 0px;
+	-webkit-appearance: none;
+}
+
+#canvasContainer{
+	position: absolute;
+	left: 320px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	text-align: center;
+}
+
+#controls{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 320px;
+	bottom: 0px;
+	padding: 10px;
+}
+
+#newTransforms{
+	/*position: absolute;
+	bottom: 0px;*/
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+#newTransforms button{
+	display: inline-block;
+	height: 45px;
+	width: 45px;
+}
+
+#appliedTransforms{
+	height: calc(100% - 55px);
+	margin-bottom: 10px;
+	overflow-y: auto;
+	margin-right: -10px;
+	padding-right: 10px;
+}
+
+#usageHint{
+	color: #AAAAAA;
+}
+
+button{
+	background-image: linear-gradient(to bottom, #EEEEEE, #CCCCCC);
+	border-radius: 3px;
+	border: 1px #666666 solid;
+	padding: 1px;
+	cursor: pointer;
+}
+
+button:hover{
+	background-image: linear-gradient(to bottom, #FFFFFF, #EEEEEE);
+}
+
+button img{
+	height: 100%;
+	width: 100%;
+}
+
+button[disabled]{
+	cursor: default;
+}
+
+button[disabled] img{
+	opacity: 0.3;
+}
+
+button[disabled]:hover{
+	background-image: linear-gradient(to bottom, #EEEEEE, #CCCCCC);
+}
+
+.transform{
+	width: 100%;
+	background-color: #DDDDDD;
+	border-radius: 3px;
+	border: 1px #666666 solid;
+	margin-bottom: 7px;
+	padding: 5px;
+}
+
+.transform-toolbar button{
+	float: right;
+	margin-left: 3px;
+	height: 25px;
+	width: 25px;
+	padding: 0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
