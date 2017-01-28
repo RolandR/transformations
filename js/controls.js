@@ -2,6 +2,52 @@
 
 var renderer = new Renderer("renderCanvas");
 
+
+document.getElementById("animateButton").onclick = interpolateStart;
+
+function interpolateStart(){
+	var duration = document.getElementById("animateDuration").value * 1;
+	var startTime = Date.now();
+	var reverse = false;
+
+	interpolate();
+
+	function interpolate(){
+
+		var interpolation = (Date.now() - startTime) / duration;
+		
+		if(interpolation > 1){
+			if(!reverse){
+				applyTransforms(1);
+				renderer.render();
+				reverse = true;
+				startTime = Date.now() + duration/10;
+				setTimeout(interpolate, duration/10);
+				return;
+			} else {
+				applyTransforms(0);
+				renderer.render();
+				return;
+			}
+		}
+
+		var x = interpolation;
+		var a = 1;
+		interpolation = (Math.sqrt((1+a*a)/(1+a*a*Math.pow(Math.sin((x-0.5)*Math.PI),2)))*Math.sin((x-0.5)*Math.PI))/2+0.5;
+
+		if(!reverse){
+			applyTransforms(interpolation);
+			renderer.render();
+		} else {
+			applyTransforms(1-interpolation);
+			renderer.render();
+		}
+
+		window.requestAnimationFrame(interpolate);
+	}
+	
+}
+
 var transforms = [];
 
 transforms.push({matrix:[
@@ -23,11 +69,88 @@ var transformsContainer = document.getElementById("appliedTransforms");
 var cos = Math.cos;
 var sin = Math.sin;
 
+function applyTransforms(interpolation){
+	for(var i in transforms){
+		var a = transforms[i].value;
+		
+		switch(transforms[i].type){
+			case "rotateX":
+				a = a*(1-interpolation);
+				transforms[i].matrix = [
+					1,       0,        0,     0,
+					0,  cos(a),  -sin(a),     0,
+					0,  sin(a),   cos(a),     0,
+					0,       0,        0,     1
+				];
+			break;
+			case "rotateY":
+				a = a*(1-interpolation);
+				transforms[i].matrix = [
+					 cos(a),   0, sin(a),   0,
+						  0,   1,      0,   0,
+					-sin(a),   0, cos(a),   0,
+						  0,   0,      0,   1
+				];
+			break;
+			case "rotateZ":
+				a = a*(1-interpolation);
+				transforms[i].matrix = [
+					cos(a), -sin(a),    0,    0,
+					sin(a),  cos(a),    0,    0,
+						 0,       0,    1,    0,
+						 0,       0,    0,    1
+				];
+			break;
+			case "scale":
+				console.log(a);
+				x = a.x*(1-interpolation) + interpolation;
+				y = a.y*(1-interpolation) + interpolation;
+				z = a.z*(1-interpolation) + interpolation;
+				transforms[i].matrix[0] = x;
+				transforms[i].matrix[5] = y;
+				transforms[i].matrix[10] = z;
+			break;
+			case "translate":
+				x = a.x*(1-interpolation);
+				y = a.y*(1-interpolation);
+				z = a.z*(1-interpolation);
+				transforms[i].matrix[12] = x;
+				transforms[i].matrix[13] = y;
+				transforms[i].matrix[14] = z;
+			break;
+			case "perspective":
+				x = a.x*(1-interpolation);
+				y = a.y*(1-interpolation);
+				z = a.z*(1-interpolation);
+				transforms[i].matrix[3] = x;
+				transforms[i].matrix[7] = y;
+				transforms[i].matrix[11] = z;
+			break;
+		}
+	}
+}
+
 function addTransform(type){
 
 	var container = document.createElement("div");
 	container.className = "transform";
 	//container.innerHTML = type;
+
+	var value = 0;
+	if(type == "translate" || type == "perspective"){
+		value = {
+			 x: 0
+			,y: 0
+			,z: 0
+		};
+	}
+	if(type == "scale"){
+		value = {
+			 x: 1
+			,y: 1
+			,z: 1
+		};
+	}
 
 	var transform = {
 		matrix: [
@@ -36,6 +159,8 @@ function addTransform(type){
 			,0, 0, 1, 0
 			,0, 0, 0, 1
 		]
+		,type: type
+		,value: value
 	};
 
 	transforms.push(transform);
@@ -133,13 +258,14 @@ function addTransform(type){
 			container.appendChild(angleSlider);
 
 			angleSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix = [
 					1,       0,        0,     0,
 					0,  cos(a),  -sin(a),     0,
 					0,  sin(a),   cos(a),     0,
 					0,       0,        0,     1
 				];
+				transform.value = a;
 				label.innerHTML = "X rotation: "+Math.round(180*a/Math.PI)+"°";
 				renderer.render();
 			}
@@ -159,13 +285,14 @@ function addTransform(type){
 			container.appendChild(angleSlider);
 
 			angleSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix = [
 					 cos(a),   0, sin(a),   0,
 						  0,   1,      0,   0,
 					-sin(a),   0, cos(a),   0,
 						  0,   0,      0,   1
 				];
+				transform.value = a;
 				label.innerHTML = "Y rotation: "+Math.round(180*a/Math.PI)+"°";
 				renderer.render();
 			}
@@ -185,13 +312,14 @@ function addTransform(type){
 			container.appendChild(angleSlider);
 
 			angleSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix = [
 					cos(a), -sin(a),    0,    0,
 					sin(a),  cos(a),    0,    0,
 						 0,       0,    1,    0,
 						 0,       0,    0,    1
 				];
+				transform.value = a;
 				label.innerHTML = "Z rotation: "+Math.round(180*a/Math.PI)+"°";
 				renderer.render();
 			}
@@ -211,8 +339,9 @@ function addTransform(type){
 			container.appendChild(xSlider);
 
 			xSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[0] = a;
+				transform.value.x = a;
 				xLabel.innerHTML = "X scale factor: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -231,8 +360,9 @@ function addTransform(type){
 			container.appendChild(ySlider);
 
 			ySlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[5] = a;
+				transform.value.y = a;
 				yLabel.innerHTML = "Y scale factor: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -251,8 +381,9 @@ function addTransform(type){
 			container.appendChild(zSlider);
 
 			zSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[10] = a;
+				transform.value.z = a;
 				zLabel.innerHTML = "Z scale factor: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -272,8 +403,9 @@ function addTransform(type){
 			container.appendChild(xSlider);
 
 			xSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[12] = a;
+				transform.value.x = a;
 				xLabel.innerHTML = "X translation: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -292,8 +424,9 @@ function addTransform(type){
 			container.appendChild(ySlider);
 
 			ySlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[13] = a;
+				transform.value.y = a;
 				yLabel.innerHTML = "Y translation: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -312,8 +445,9 @@ function addTransform(type){
 			container.appendChild(zSlider);
 
 			zSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[14] = a;
+				transform.value.z = a;
 				zLabel.innerHTML = "Z translation: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -333,8 +467,9 @@ function addTransform(type){
 			container.appendChild(xSlider);
 
 			xSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[3] = a;
+				transform.value.x = a;
 				xLabel.innerHTML = "X vanishing point: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -353,8 +488,9 @@ function addTransform(type){
 			container.appendChild(ySlider);
 
 			ySlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[7] = a;
+				transform.value.y = a;
 				yLabel.innerHTML = "Y vanishing point: "+Math.round(a*100)/100;
 				renderer.render();
 			}
@@ -364,8 +500,8 @@ function addTransform(type){
 			
 			var zSlider = document.createElement("input");
 			zSlider.type = "range";
-			zSlider.min = "-1";
-			zSlider.max = "1";
+			zSlider.min = "-2";
+			zSlider.max = "2";
 			zSlider.step = "0.01";
 			zSlider.value = "0";
 
@@ -373,8 +509,9 @@ function addTransform(type){
 			container.appendChild(zSlider);
 
 			zSlider.oninput = function(){
-				var a = this.value;
+				var a = this.value*1;
 				transform.matrix[11] = a;
+				transform.value.z = a;
 				zLabel.innerHTML = "Z vanishing point: "+Math.round(a*100)/100;
 				renderer.render();
 			}

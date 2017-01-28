@@ -25,7 +25,7 @@ canvas{
 
 hr{
 	border-bottom: 1px #AAAAAA solid;
-	margin: 10px 0px;
+	margin: 3px 0px;
 }
 
 input[type=range]{
@@ -69,11 +69,56 @@ input[type=range]{
 }
 
 #appliedTransforms{
-	height: calc(100% - 55px);
+	height: calc(100% - 120px);
 	margin-bottom: 10px;
 	overflow-y: auto;
 	margin-right: -10px;
 	padding-right: 10px;
+}
+
+hr.break{
+	margin: 20px -10px -10px -10px;
+}
+
+h2{
+	font-size: 18px;
+	font-weight: normal;
+	color: #CCCCCC;
+	line-height: 1em;
+	position: relative;
+	top: 0px;
+	background-color: #222222;
+	display: inline-block;
+	width: auto;
+	padding: 0px 5px;
+}
+
+#animateControls{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	color: #AAAAAA;
+	font-size: 16px;
+	margin-top: 6px;
+}
+
+#animateButton{
+	width: 120px;
+	height: 30px;
+	margin-top: -4px;
+	font-size: 16px;
+	padding: 3px;
+}
+
+#animateDuration{
+	width: 50px;
+	height: 25px;
+	font-size: 16px;
+	padding: 3px;
+	text-align: right;
+	background-color: #111111;
+	color: #AAAAAA;
+	border: 1px #333333 solid;
 }
 
 #usageHint{

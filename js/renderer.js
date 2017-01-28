@@ -105,12 +105,30 @@ function Renderer(canvasId){
 	
 	function render(){
 
+		/*if(!interpolation){
+			interpolation = 0;
+		}
+
+		var identityMatrix = [
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		];*/
+
+		//console.table(transforms);
+
 		var transformsArray = [];
 		for(var i in transforms){
 			transformsArray.push(transforms[i].matrix);
 		}
 
-		var transformMatrix = multiplyArrayOfMatrices(transformsArray);
+		var transformMatrix = multiplyArrayOfMatrices(transformsArray).slice();
+
+		/*for(var i in transformMatrix){
+			transformMatrix[i] = transformMatrix[i] * (1-interpolation) + identityMatrix[i] * interpolation;
+		}*/
+		
 		var normalsMatrix = normalMatrix(transformMatrix);
 
 		gl.uniformMatrix4fv(transformMatrixRef, false, transformMatrix);
